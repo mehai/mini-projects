@@ -39,22 +39,14 @@ class Producer(Thread):
 
     def run(self):
         prod_id = self.marketplace.register_producer()
-        to_publish = [[product for product in self.products if product[1] >= i]
-                      for i in range(1, max(self.products, key=lambda e: e[1])[1] + 1)]
-
         while True:
-            for product_list in to_publish:
-                for product in product_list:
+            for product in self.products:
+                quantity = product[1]
+                while quantity > 0:
                     produce(product)
                     while not self.marketplace.publish(producer_id=prod_id, product=product[0]):
                         sleep(self.republish_wait_time)
-            # for product in self.products:
-            #     quantity = product[1]
-            #     while quantity > 0:
-            #         self.produce(product)
-            #         while not self.marketplace.publish(producer_id=prod_id, product=product[0]):
-            #             sleep(self.republish_wait_time)
-            #         quantity -= 1
+                    quantity -= 1
 
 def produce(product):
     """

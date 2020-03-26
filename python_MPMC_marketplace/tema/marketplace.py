@@ -24,7 +24,7 @@ class Marketplace:
         self.register_lock = Lock()
         self.producers = []
         #buffer
-        self.producer_lock = Lock()
+        self.market_lock = Lock()
         self.available_products = {}
         #carts logic
         self.carts = []
@@ -54,7 +54,7 @@ class Marketplace:
         """
         if self.producers[producer_id] == self.queue_size_per_producer:
             return False
-        with self.producer_lock:
+        with self.market_lock:
             if product in self.available_products:
                 self.available_products[product].append(producer_id)
             else:
@@ -71,9 +71,9 @@ class Marketplace:
         with self.carts_lock:
             if self.free_carts:
                 return self.free_carts.pop()
-        new_cart = {}
-        self.carts.append(new_cart)
-        return len(self.carts) - 1
+            new_cart = {}
+            self.carts.append(new_cart)
+            return len(self.carts) - 1
 
     def add_to_cart(self, cart_id, product):
         """
@@ -90,8 +90,7 @@ class Marketplace:
         if product not in self.available_products or \
             not self.available_products[product]:
             return False
-        producer_id = -1
-        with self.producer_lock:
+        with self.market_lock:
             producer_id = self.available_products[product].pop()
             self.producers[producer_id] -= 1
         if product in self.carts[cart_id]:
@@ -112,9 +111,10 @@ class Marketplace:
         """
         if product not in self.carts[cart_id]:
             return
-        producer_id = self.carts[cart_id][product].pop()
-        with self.producer_lock:
-            self.producers[producer_id] -= 1
+        self.carts[cart_id][product].pop()
+        with self.market_lock:
+            # add it with -1 producer_id to not interfere with queue size
+            self.available_products[product].append(-1)
 
     def place_order(self, cart_id):
         """
@@ -125,11 +125,6 @@ class Marketplace:
         """
         products = [(product, len(self.carts[cart_id][product]))
                     for product in self.carts[cart_id].keys()]
-        # with self.producer_lock:
-        #     for product, _ in products:
-        #         for producer_id in self.carts[cart_id][product]:
-        #                 self.producers[producer_id] -= 1
         self.carts[cart_id].clear()
-        with self.carts_lock:
-            self.free_carts.append(cart_id)
+        self.free_carts.append(cart_id)
         return products
