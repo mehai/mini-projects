@@ -2,6 +2,7 @@ import paho.mqtt.client as mqtt
 import time
 
 CLIENT_ID = 'MEHAI_CLIENT_TEST'
+BROKER_IP = '127.0.0.1'
 
 
 def on_message(client, userdata, message):
@@ -14,7 +15,7 @@ def on_message(client, userdata, message):
 def main():
     client = mqtt.Client(CLIENT_ID)
     client.on_message = on_message
-    client.connect('test.mosquitto.org')
+    client.connect(BROKER_IP)
     client.loop_start()
 
     client.subscribe("mehai_topic_test")
@@ -22,8 +23,8 @@ def main():
     time.sleep(4)
 
     client.loop_stop()
-
     client.disconnect()
+
 
 if __name__ == '__main__':
     main()
