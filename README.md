@@ -11,3 +11,5 @@ A small project implementing the client and the broker for a mqtt communication.
 Consists of a few scripts demonstarating the usage of timescaleDB in the context of time-series data provided
 by the taxi services in NYC. It follows a tutorial on the timescaleDB website.
 
+## timescaleDB_python
+A simple python client interacting with an instance of PostgreSQL (TimescaleDB extension).
