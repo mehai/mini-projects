@@ -24,10 +24,12 @@ It will sometimes provide corrupted data, null values etc. which should be filte
 out by the Data Filtering microservice.
 
 ### MQTT Broker
-The broker needs to have an adequate QoS setup so that the IoT Gateway can authenticate as securely as possible. It also needs to be setup so that the IoT gateway and the Data Filtering & Storage Microservice can authenticate to it.
+The broker needs to have an adequate QoS setup so that the IoT Gateway can authenticate as securely as possible.
+It also needs to be setup so that the IoT gateway and the Data Filtering & Storage Microservice can authenticate to it.
 
 ### Data Filtering & Storage Microservice
-TODO
+This microservice should be subscribed to the "home" topic.
+It should filter the received data and store it in TimescaleDB.
 
 ### TimescaleDB
 TODO
