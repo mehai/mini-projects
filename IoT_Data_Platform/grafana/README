@@ -1,0 +1,5 @@
+IMPORTANT! before running the container make sure you have a persistent volume called grafana-storage.
+docker volume create grafana-storage
+
+If you want to launch grafana on localhost:
+sudo service start grafana-server
