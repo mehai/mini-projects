@@ -9,9 +9,11 @@ def main(subscriber):
         time.sleep(5)
         cmd = input("Would you like to quit? y/n")
         if cmd == 'y':
+            print("Ending connection...")
             subscriber.end_connection()
+            break
 
 
 if __name__ == '__main__':
-    sub = Subscriber(Filter(DBConnector()))
+    sub = Subscriber(Filter(DBConnector('localhost', 'test', 'test', "test")))
     main(sub)
