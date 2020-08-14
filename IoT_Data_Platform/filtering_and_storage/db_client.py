@@ -1,5 +1,6 @@
 import psycopg2
 import json
+import time
 
 query_enable_timescaledb_extension = """
 CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;
@@ -42,12 +43,18 @@ class DBConnector:
     be externally used through the insert function.
     """
     def __init__(self, host, user, passw, db_name):
-        self.CONNECTION = "postgres://{}:{}@{}:5432/{}?sslmode=require"
+        self.CONNECTION = "postgres://{}:{}@{}/{}"
         self.host = host
         self.user = user
         self.passw = passw
         self.db_name = db_name
         self.conn = self.__connect()
+        # wait until db is ready and connection is accepted
+        while self.conn is None:
+            print('Connection could not be established...')
+            time.sleep(5)
+            self.conn = self.__connect()
+        print('Connection to the database succeded!')
         self.__create_tables()
         self.__init_tables()
 

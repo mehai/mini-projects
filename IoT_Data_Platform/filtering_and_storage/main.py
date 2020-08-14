@@ -1,19 +1,14 @@
 from subscriber import Subscriber
 from filter_ms import Filter
 from db_client import DBConnector
+from get_docker_secret import get_docker_secret
 import time
-
-
-def main(subscriber):
-    while True:
-        time.sleep(5)
-        cmd = input("Would you like to quit? y/n")
-        if cmd == 'y':
-            print("Ending connection...")
-            subscriber.end_connection()
-            break
+import os
 
 
 if __name__ == '__main__':
-    sub = Subscriber(Filter(DBConnector('localhost', 'test', 'test', "test")))
-    main(sub)
+    tsdb_host = os.getenv('TSDB_HOST')
+    tsdb_user = get_docker_secret(os.getenv('TSDB_USER'), default='test')
+    tsdb_password = get_docker_secret(os.getenv('TSDB_PASSWORD'), default='test')
+    tsdb_db = os.getenv('TSDB_DB')
+    sub = Subscriber(Filter(DBConnector(tsdb_host, tsdb_user, tsdb_password, tsdb_db)))

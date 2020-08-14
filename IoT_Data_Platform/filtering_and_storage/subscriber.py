@@ -1,10 +1,11 @@
 import paho.mqtt.client as mqtt
 from filter_ms import Filter
+import os
 
 
 class Subscriber:
     CLIENT_ID = 'Filtering_Microservice'
-    BROKER_IP = '127.0.0.1'
+    BROKER_IP = os.getenv('BROKER_IP')
 
     def __init__(self, filter_service: Filter):
         self.filter_service = filter_service
