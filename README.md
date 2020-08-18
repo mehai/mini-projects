@@ -13,3 +13,7 @@ by the taxi services in NYC. It follows a tutorial on the timescaleDB website.
 
 ## timescaleDB_python
 A simple python client interacting with an instance of PostgreSQL (TimescaleDB extension).
+
+## IoT_Data_Platform
+A bigger project which simulares the data ingestion from an IoT gateway, stores and does analysis on the data using TimescaleDB and Grafana.
+

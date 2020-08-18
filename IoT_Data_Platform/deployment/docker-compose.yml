@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  broker:
+    image: eclipse-mosquitto:1.6.10
+    volumes:
+      - ../broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - iot_mosquitto_data:/mosquitto/data
+      - iot_mosquitto_log:/mosquitto/log
+    ports:
+    - "1883:1883"
+
+  fas-service:
+    build: ../filtering_and_storage/
+    environment:
+      BROKER_IP: ${BROKER_IP}
+      TSDB_HOST: ${TSDB_HOST}
+      TSDB_USER: timescaledb-pguser-secret
+      TSDB_PASSWORD: timescaledb-pgpassword-secret
+      TSDB_DB: ${TSDB_DB}
+    secrets:
+      - timescaledb-pguser-secret
+      - timescaledb-pgpassword-secret
+
+  timescaledb:
+    image: timescale/timescaledb:1.7.0-pg12
+    environment:
+      TIMESCALEDB_TELEMETRY: ${TIMESCALEDB_TELEMETRY}
+      POSTGRES_USER_FILE: /run/secrets/timescaledb-pguser-secret
+      POSTGRES_PASSWORD_FILE: /run/secrets/timescaledb-pgpassword-secret
+      POSTGRES_DB: ${TSDB_DB}
+      TZ: Europe/Bucharest
+      PGTZ: Europe/Bucharest
+    # ports here are only for debug purposes, it should not normally be forwarded to host
+    ports:
+      - "5555:5432"
+    volumes:
+      - timescaledb-storage:/var/lib/postgresql/data
+    secrets:
+      - timescaledb-pguser-secret
+      - timescaledb-pgpassword-secret
+
+  grafana:
+    image: grafana/grafana:7.0.0
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    ports:
+      - "3000:3000"
+
+volumes:
+  iot_mosquitto_data:
+  iot_mosquitto_log:
+  timescaledb-storage:
+  grafana-storage:
+
+secrets:
+  timescaledb-pguser-secret:
+    file: ../timescaleDB/secrets/pguser_secret.txt
+  timescaledb-pgpassword-secret:
+    file: ../timescaleDB/secrets/pgpassword_secret.txt
